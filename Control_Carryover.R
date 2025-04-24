@@ -1,103 +1,94 @@
-library(tidyverse)
-
 rm(list = ls())
 
-# Set seed for reproducibility
-set.seed(123)
+library(tools)
+library(tidyverse)
+library(stringr)
 
 # Number of subjects
-N <- 1000
 
-# Parameter Variation
-M <- 100
-
-# Simulate treatment assignment for period 1
-Z1 <- rbinom(N, 1, 0.5)        # Random assignment to treatment (1) or control (0)
-Z2 <- rbinom(N, 1, 0.5)        # Re-randomization
-
-# Simulate covariates
-X1 <- rnorm(N)                # Covariate at period 1
-X2 <- rnorm(N)                # Covariate at period 2 (could be correlated with X1)
-gap <- runif(N, 1, 5)          # Time gap between periods (for decay model)
-
-# Simulate period 1 outcome
-alpha0 <- 0; alpha1 <- 1; alpha2 <- 1
-sigma1 <- 1
-
-Y1 <- alpha0 + alpha1 * Z1 + alpha2 * X1 + rnorm(N, 0, sigma1)
-
-# Parameters for period 2 outcome models
-beta0 <- 0; beta1 <- 1; beta2 <- 1
-gamma <- seq(from = -5, to = 5, length.out = M)
-delta <- seq(from = -5, to = 5, length.out = M)
-theta <- seq(from = -5, to = 5, length.out = M)
-lambda <- seq(from = -5, to = 5, length.out = M)
-sigma2 <- 1
-
-i <- 1
-
-# Model 1: Baseline (No Carryover)
-Y2_baseline <- beta0 + beta1 * Z2 + beta2 * X2 + rnorm(N, 0, sigma2)
-
-# Model 2: Fixed-Effect Carryover
-Y2_fixed <- beta0 + beta1 * Z2 + gamma[i] * Z1 + beta2 * X2 + rnorm(N, 0, sigma2)
-
-# Model 3: Interactive Carryover Model
-Y2_interact <- beta0 + beta1 * Z2 + Z1 + delta[i] * (Z1 * Z2) + beta2 * X2 + rnorm(N, 0, sigma2)
-
-# Model 4: Lagged Outcome (Dynamic) Model
-Y2_lag <- beta0 + beta1 * Z2 +  Z1 + theta[i] * Y1 + beta2 * X2 + rnorm(N, 0, sigma2)
-
-# Model 5: Moderated Carryover Model
-Y2_mod <- beta0 + beta1 * Z2 + gamma * Z1 + delta[i] * (Z1 * X1) + beta2 * X2 + rnorm(N, 0, sigma2)
-
-# Model 6: Decay Model
-Y2_decay <- beta0 + beta1 * Z2 + gamma * exp(-lambda[i] * gap) * Z1 + beta2 * X2 + rnorm(N, 0, sigma2)
-
-# Combine all variables into a data frame
-sim_data <- data.frame(ID = 1:N, parameter = gamma[i], Z1, Z2, X1, X2, gap, Y1, 
-                       Y2_baseline, Y2_fixed, Y2_interact, Y2_lag, Y2_mod, Y2_decay)
-
-for (i in 2:M) {
-  # Model 1: Baseline (No Carryover)
-  Y2_baseline <- beta0 + beta1 * Z2 + beta2 * X2 + rnorm(N, 0, sigma2)
+simulation <- function(param) {
   
-  # Model 2: Fixed-Effect Carryover
-  Y2_fixed <- beta0 + beta1 * Z2 + gamma[i] * Z1 + beta2 * X2 + rnorm(N, 0, sigma2)
+  N <- 100
   
-  # Model 3: Interactive Carryover Model
-  Y2_interact <- beta0 + beta1 * Z2 + Z1 + delta[i] * (Z1 * Z2) + beta2 * X2 + rnorm(N, 0, sigma2)
+  # Simulate treatment assignment for period 1
+  Z1 <- rbinom(N, 1, 0.5)        # Random assignment to treatment (1) or control (0)
+  Z2 <- rbinom(N, 1, 0.5)        # Re-randomization
   
-  # Model 4: Lagged Outcome (Dynamic) Model
-  Y2_lag <- beta0 + beta1 * Z2 +  Z1 + theta[i] * Y1 + beta2 * X2 + rnorm(N, 0, sigma2)
+  # Simulate covariates
+  X1 <- rnorm(N)                # Covariate at period 1
+  X2 <- X1 + rnorm(N)             # Covariate at period 2 (could be correlated with X1)
+  gap <- runif(N, 1, 5)          # Time gap between periods (for decay model)
   
-  # Model 5: Moderated Carryover Model
-  Y2_mod <- beta0 + beta1 * Z2 + gamma * Z1 + delta[i] * (Z1 * X1) + beta2 * X2 + rnorm(N, 0, sigma2)
+  # Simulate period 1 outcome
+  alpha0 <- 2; alpha1 <- 5; alpha2 <- 5
+  sigma1 <- 1
   
-  # Model 6: Decay Model
-  Y2_decay <- beta0 + beta1 * Z2 + gamma * exp(-lambda[i] * gap) * Z1 + beta2 * X2 + rnorm(N, 0, sigma2)
+  Y1 <- alpha0 + alpha1 * Z1 + alpha2 * X1 + rnorm(N, 0, sigma1)
   
-  # Combine all variables into a data frame
-  sim_data <- rbind(sim_data, data.frame(ID = 1:N, parameter = gamma[i], Z1, Z2, X1, X2, gap, Y1, 
-                         Y2_baseline, Y2_fixed, Y2_interact, Y2_lag, Y2_mod, Y2_decay))
+  # Parameters for period 2 outcome models
+  beta0 <- 2; beta1 <- 5; beta2 <- 5
+  sigma2 <- 1
+  
+  
+  # Model 1: Interactive Carryover Model
+  Y2_interact <- beta0 + beta1 * Z2 + param * (Z1 * Z2) + beta2 * X2 + rnorm(N, 0, sigma2)
+  
+  # Model 2: Compounding Effect Single Effect
+  Y2_compound <- beta0 + beta1^(1+ param*Z1)*(Z2) + beta2 * X2 + rnorm(N, 0, sigma2)
+  
+  interact <- summary(lm(Y2_interact  ~ Z2 + X2))$coefficients[2,1]
+  interact_fixed <- summary(lm(Y2_interact ~ Z2 + Z1 + X2))$coefficients[2,1]
+  
+  compound <- summary(lm(Y2_compound  ~ Z2 + X2))$coefficients[2,1]
+  compound_fixed <- summary(lm(Y2_compound ~ Z2 + Z1 + X2))$coefficients[2,1]
+  
+  
+  return( c(interact, interact_fixed, compound, compound_fixed))
+
 }
 
-sim_data |>
+
+parameters <- seq(-5, 5, length.out = 100)
+d <- as.data.frame(do.call(rbind, lapply(parameters, function(i) simulation(i))))
+
+colnames(d) <- c("interaction", "interaction_fixed", "compound", "compound_fixed")
+d$parameters <- parameters
+d$simulation <- 1
+
+for (i in 2:100) {
+  d1 <- as.data.frame(do.call(rbind, lapply(parameters, function(i) simulation(i))))
+  
+  
+  d1$parameters <- parameters
+  d1$simulation <- i
+  
+  colnames(d1) <- colnames(d)
+  d <- rbind(d, d1)
+  
+}
+
+d |>
+  gather(key = "Type", value = "Estimate", 1:4) |>
+  group_by(Type, parameters) |>
+  summarize( Mean = mean(Estimate),
+             Max = max(Estimate),
+             Min = min(Estimate) ) |>
   mutate(
-    no_control_est = summary(lm(Y2_baseline ~ Z2 + X2))$coefficients[2,1]
-  )
+    Estimation = ifelse(grepl("_", Type), "No Control", "Fixed Effect"),
+    Structure = toTitleCase(sub("\\_.*", "", Type))
+  )  -> d1
 
-sim_data$no_control_est <- summary(lm(Y2_baseline ~ Z2 + X2, sim_data))$coefficients[2,1]
-sim_data$no_control_se <- summary(lm(Y2_baseline ~ Z2 + X2, sim_data))$coefficients[2,2]
-sim_data$no_control_est <- summary(lm(Y2_baseline ~ Z2 + X2, sim_data))$coefficients[2,1]
-sim_data$no_control_se <- summary(lm(Y2_baseline ~ Z2 + X2, sim_data))$coefficients[2,2]
+ggplot(data = d1, aes(x=parameters, y=Mean, color=Estimation)) +
+  geom_point(size = 0.2) + 
+  geom_line(aes(y = 5), col = "red") +
+  geom_errorbar(aes(ymin=Min, ymax=Max), position = "dodge", 
+                size=.1, color="black", width=.1) + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black"),
+        plot.title = element_text(hjust = 0.5, face = "bold", size=12), 
+        axis.title=element_text(size=10,face="bold"), legend.position = "top") +
+  xlab("Magnitude of Carryover Effect") +
+  ylab("Estimate") +
+  facet_wrap(~ Structure, scale = "free_y") 
 
-summary(lm(Y2_fixed ~ Z1 + Z2 + X2, sim_data))
-
-summary(lm(Y2_interact ~ Z1 + Z2 + X2, sim_data))
-
-summary(lm(Y2_lag ~ Z1 + Z2 + X2, sim_data))
-
-summary(lm(Y2_mod ~ Z1 + Z2 + X2, sim_data))
-
-summary(lm(Y2_decay ~ Z1 + Z2 + X2, sim_data))
+ggsave("CarryoverEffect.png", device = "png", width = 8, height = 4)
