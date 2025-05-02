@@ -1,7 +1,32 @@
-library(tidyverse)
+# -----------------------------------------------------------------------------
+# Author: Justin Ho
+#
+# This script simulates and compares the performance of various estimation 
+# strategies in two experimental designs: 
+# (1) Counterbalanced Within-Subjects Design (CWSD) 
+# (2) Sequential Randomization.
+# 
+# For each design, it evaluates five estimation strategies:
+# - No control
+# - Direct control for covariates
+# - Propensity score adjustment
+# - Misspecification of covariates
+# - Fixed effects
+#
+# The simulation varies the effect size of treatment on covariates and estimates 
+# treatment effects across num_times (100 is default) replications per level. 
+# Results are visualized 
+# to show bias and robustness of each strategy under different conditions.
+#
+# Output:
+# - A plot saved to ./Figures/Design_Comparison.png showing estimated effects 
+#   with error bars across the range of covariate effects, by design and strategy.
+# -----------------------------------------------------------------------------
 
 rm(list = ls())
+library(tidyverse)
 
+## Function to simulate the two designs
 simulate_cwsd <- function(eff_size_covariate, control=c("no control", "direct control", "propensity score", "misspecification", "fixed effects"), rerandomize = FALSE){
   
   N <- 1000
@@ -50,14 +75,24 @@ simulate_cwsd <- function(eff_size_covariate, control=c("no control", "direct co
   
 }
 
+## Number of replications
 num_times <- 100
+
+## Grids of effect size
 eff_size_cov <- rep(seq(-1000,1000,20)/100, num_times)
+
+##============================================================
+## Simulation of CWSD with different estimation strategies
+##============================================================
+
+## Simulation with different estimation strategies in CWSD
 no_ctrl <- sapply(eff_size_cov, function(i) simulate_cwsd(i, "no control"))
 with_ctrl <- sapply(eff_size_cov, function(i) simulate_cwsd(i, "direct control"))
 prop_ctrl <- sapply(eff_size_cov, function(i) simulate_cwsd(i, "propensity score"))
 fixed_eff <- sapply(eff_size_cov, function(i) simulate_cwsd(i, "fixed effects"))
 wrong_ctrl <- sapply(eff_size_cov, function(i) simulate_cwsd(i, "misspecification"))
 
+## Combining to a tibble
 df_cwsd <- tibble(
   eff_size_cov = eff_size_cov,
   `No Control` = no_ctrl, 
@@ -68,12 +103,17 @@ df_cwsd <- tibble(
   Design = "Counterbalanced Within-Subjects"
 )
 
+##=====================================================================
+## Simulation of Seq Randomization with different estimation strategies
+##=====================================================================
+
 no_ctrl <- sapply(eff_size_cov, function(i) simulate_cwsd(i, "no control", rerandomize = T))
 with_ctrl <- sapply(eff_size_cov, function(i) simulate_cwsd(i, "direct control", rerandomize = T))
 prop_ctrl <- sapply(eff_size_cov, function(i) simulate_cwsd(i, "propensity score", rerandomize = T))
 fixed_eff <- sapply(eff_size_cov, function(i) simulate_cwsd(i, "fixed effects", rerandomize = T))
 wrong_ctrl <- sapply(eff_size_cov, function(i) simulate_cwsd(i, "misspecification", rerandomize = T))
 
+## Combining to a tibble
 df_rerandom <- tibble(
   eff_size_cov = eff_size_cov,
   `No Control` = no_ctrl, 
@@ -84,7 +124,12 @@ df_rerandom <- tibble(
   Design = "Sequential Randomization"
 )
 
+## Combine both CWSD and Sequential Randomization
 df <- rbind(df_cwsd, df_rerandom)
+
+##====================================================
+##        Simulation Visualization
+##====================================================
 
 df |>
   gather(key = "Control", value = "estimate", 2:(length(colnames(df)) - 1)) |>
@@ -107,4 +152,4 @@ ggplot(data = df_plot, aes(x=eff_size_cov, y=expected_estimate, color=Control)) 
   ylab("Estimated Effect") +
   facet_wrap(~ Design)
 
-ggsave("Design_Comparison.png", device = "png", width = 8, height = 4)
+ggsave("./Figures/Design_Comparison.png", device = "png", width = 8, height = 4)

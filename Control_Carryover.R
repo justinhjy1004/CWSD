@@ -1,3 +1,21 @@
+# -------------------------------------------------------------
+# Author: Justin Ho
+#
+# Description:
+#   Simulates two-period cross-over experiments under different
+#   carryover effect structures, fits linear models, and
+#   visualizes how estimated treatment effects vary with carryover
+#   magnitude and model specification.
+#
+#   - Model 1: Interactive carryover between periods
+#   - Model 2: Compounding single-effect carryover
+#
+#   Results are aggregated over multiple simulation runs, then
+#   plotted with error bars to show min, max, and mean estimates.
+#
+# -------------------------------------------------------------
+
+
 rm(list = ls())
 
 library(tools)
@@ -5,18 +23,19 @@ library(tidyverse)
 library(stringr)
 
 # Number of subjects
+N <- 100
 
 simulation <- function(param) {
-  
-  N <- 100
-  
+
   # Simulate treatment assignment for period 1
+  
   Z1 <- rbinom(N, 1, 0.5)        # Random assignment to treatment (1) or control (0)
   Z2 <- rbinom(N, 1, 0.5)        # Re-randomization
   
   # Simulate covariates
+  
   X1 <- rnorm(N)                # Covariate at period 1
-  X2 <- X1 + rnorm(N)             # Covariate at period 2 (could be correlated with X1)
+  X2 <- X1 + rnorm(N)           # Covariate at period 2 (could be correlated with X1)
   gap <- runif(N, 1, 5)          # Time gap between periods (for decay model)
   
   # Simulate period 1 outcome
@@ -47,15 +66,22 @@ simulation <- function(param) {
 
 }
 
-
+## Carryover parameters to evaluate
 parameters <- seq(-5, 5, length.out = 100)
+
+# Run first batch of simulations and assemble results
 d <- as.data.frame(do.call(rbind, lapply(parameters, function(i) simulation(i))))
 
 colnames(d) <- c("interaction", "interaction_fixed", "compound", "compound_fixed")
 d$parameters <- parameters
 d$simulation <- 1
 
-for (i in 2:100) {
+
+# Repeat simulations for 100 runs to capture variability
+
+n_runs <- 100
+
+for (i in 2:n_runs) {
   d1 <- as.data.frame(do.call(rbind, lapply(parameters, function(i) simulation(i))))
   
   
@@ -67,6 +93,11 @@ for (i in 2:100) {
   
 }
 
+##===============================================================
+## Simulation Visualization
+##===============================================================
+
+# Gather estimates into long format, compute mean, min, max
 d |>
   gather(key = "Type", value = "Estimate", 1:4) |>
   group_by(Type, parameters) |>
@@ -78,6 +109,7 @@ d |>
     Structure = toTitleCase(sub("\\_.*", "", Type))
   )  -> d1
 
+# Plot simulated results
 ggplot(data = d1, aes(x=parameters, y=Mean, color=Estimation)) +
   geom_point(size = 0.2) + 
   geom_line(aes(y = 5), col = "red") +
@@ -91,4 +123,4 @@ ggplot(data = d1, aes(x=parameters, y=Mean, color=Estimation)) +
   ylab("Estimate") +
   facet_wrap(~ Structure, scale = "free_y") 
 
-ggsave("CarryoverEffect.png", device = "png", width = 8, height = 4)
+ggsave("./Figures/CarryoverEffect.png", device = "png", width = 8, height = 4)
