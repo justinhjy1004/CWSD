@@ -1,0 +1,252 @@
+\section*{Appendix}
+
+\subsection*{Proofs}
+
+\begin{retheorem}[Restatement of Theorem \ref{theorem: identify_bsd}]
+    Under the standard assumptions of the Rubin Causal Model, ATE is identifiable in a between-subjects design.
+\end{retheorem}
+
+\begin{proof}
+    We denote the observable outcomes as $Y_i^{\text{obs}}$ for clarity. We take the difference of the expected observed outcomes between those who received treatment $Z_i = 1$ and those those who did not $Z_i = 0$, conditioning on their covariates
+    
+    \[\mathbb{E}[Y_{i}^{\text{obs}} \mid Z_i = 1, X_i] - \mathbb{E}[Y_{i}^{\text{obs}} \mid Z_i = 0, X_i]\] 
+ 
+    We can write the following strings of equalities
+    \[
+        \begin{aligned}
+            &\quad \,\,\mathbb{E}[Y_{i}^{\text{obs}} \mid Z_i = 1, X_i] - \mathbb{E}[Y_{i}^{\text{obs}} \mid Z_i = 0, X_i] \\
+            &= \mathbb{E}[Y_i(1)Z_i + Y_i(0)(1 - Z_i) \mid Z_i = 1, X_i] - \mathbb{E}[Y_i(1)Z_i + Y_i(0)(1 - Z_i) \mid Z_i = 0, X_i] \\
+            &= \mathbb{E}[Y_i(1) \mid Z_i = 1, X_i] - \mathbb{E}[Y_i(0) \mid Z_i = 0, X_i] \\
+            &= \mathbb{E}[Y_i(1) \mid X_i] - \mathbb{E}[Y_i(0) \mid X_i] \quad \textit{(by ignorability from randomization)} \\ 
+            &= \mathbb{E}[Y_i(1) - Y_i(0) \mid X_i] 
+        \end{aligned}
+    \] which is the Conditional Average Treatment Effect. With the Conditional Average Treatment Effect, we can apply Adam's Law to obtain the Average Treatment Effect.
+
+    \[\begin{aligned}
+        \mathbb{E}_{X_i}\mathbb{E}[Y_i(1) - Y_i(0) \mid X_i] =  \mathbb{E}[Y_i(1) - Y_i(0)]  = \tau
+    \end{aligned}\]
+\end{proof}
+
+\begin{reprop}[Restatement of Proposition \ref{prop: FWL}]
+The OLS estimate from Equation \eqref{eq: OLS_estimate}, \(\hat{\alpha}_1 = \hat{\tau}^{\text{CWSD}}\), can be expressed as a convex combination of the period-specific estimates:
+\[
+\hat{\tau}^{\text{CWSD}} = q\,\hat{\tau}_{t_1} + (1-q)\,\hat{\tau}_{t_2},
+\]
+with \(q \in [0,1]\).
+\end{reprop}
+
+\begin{proof}
+For notational simplicity, define
+\[
+W_{i,t} = \begin{pmatrix} \mathbbm{1}\{t = t_1\} \\[1mm] X_{i,t} \end{pmatrix}.
+\]
+Then, the regression in Equation \eqref{eq: OLS_estimate} can be rewritten as
+\[
+Y_{i,t} = \alpha_0 + \alpha_1 Z_{i,t} + W_{i,t}'\beta + \varepsilon_{i,t},
+\]
+where
+\[
+\beta = \begin{pmatrix} \alpha_2 \\ \alpha_3 \end{pmatrix}.
+\]
+
+To isolate the effect of \(Z_{i,t}\), we first partial out the influence of \(W_{i,t}\) by estimating the auxiliary regressions:
+\[
+Y_{i,t} = \hat{\gamma}_0 + W_{i,t}'\hat{\gamma}_1 + r^Y_{i,t} \quad \text{and} \quad Z_{i,t} = \hat{\delta}_0 + W_{i,t}'\hat{\delta}_1 + r^Z_{i,t},
+\]
+where \(r^Y_{i,t}\) and \(r^Z_{i,t}\) are the residuals. By the Frisch–Waugh–Lovell theorem, the OLS estimator for \(\alpha_1\) is given by
+\[
+\begin{aligned}
+    \hat{\alpha}_1 &= \frac{\sum_{t\in\{t_1,t_2\}} \sum_{i=1}^n (r^Y_{i,t} - \bar{r}^Y_{i,t})\,(r^Z_{i,t} - \bar{r}^Z_{i,t})}{\sum_{t\in\{t_1,t_2\}} \sum_{i=1}^n (r^Z_{i,t} - \bar{r}^Z_{i,t})^2} \\
+&= \frac{\sum_{t\in\{t_1,t_2\}} \sum_{i=1}^n r^Y_{i,t}\,r^Z_{i,t}}{\sum_{t\in\{t_1,t_2\}} \sum_{i=1}^n (r^Z_{i,t})^2} \quad since \,\,\bar{r}^Z_{i,t} = \bar{r}^Y_{i,t} = 0
+\end{aligned}
+\]
+We can decompose the numerator by time period:
+\[
+\hat{\alpha}_1 = \frac{\sum_{i=1}^n r^Y_{i,t_1}\,r^Z_{i,t_1}}{\sum_{t\in\{t_1,t_2\}} \sum_{i=1}^n (r^Z_{i,t})^2} + \frac{\sum_{i=1}^n r^Y_{i,t_2}\,r^Z_{i,t_2}}{\sum_{t\in\{t_1,t_2\}} \sum_{i=1}^n (r^Z_{i,t})^2}.
+\]
+
+Focusing on the \(t_1\) component, note that
+\[
+\frac{\sum_{i=1}^n r^Y_{i,t_1}\,r^Z_{i,t_1}}{\sum_{t\in\{t_1,t_2\}} \sum_{i=1}^n (r^Z_{i,t})^2} = \left(\frac{\sum_{i=1}^n (r^Z_{i,t_1})^2}{\sum_{t\in\{t_1,t_2\}} \sum_{i=1}^n (r^Z_{i,t})^2}\right) \left(\frac{\sum_{i=1}^n r^Y_{i,t_1}\,r^Z_{i,t_1}}{\sum_{i=1}^n (r^Z_{i,t_1})^2}\right) = q\,\hat{\tau}_{t_1},
+\]
+where
+\[
+q = \frac{\sum_{i=1}^n (r^Z_{i,t_1})^2}{\sum_{t\in\{t_1,t_2\}} \sum_{i=1}^n (r^Z_{i,t})^2} \in [0,1],
+\]
+and \(\hat{\tau}_{t_1}\) is the treatment effect estimated from the \(t_1\) period alone. An analogous argument shows that the \(t_2\) component can be written as
+\[
+\frac{\sum_{i=1}^n r^Y_{i,t_2}\,r^Z_{i,t_2}}{\sum_{t\in\{t_1,t_2\}} \sum_{i=1}^n (r^Z_{i,t})^2} = (1-q)\,\hat{\tau}_{t_2}.
+\]
+Thus, we conclude that
+\[
+\hat{\tau}^{\text{CWSD}} = \hat{\alpha}_1 = q\,\hat{\tau}_{t_1} + (1-q)\,\hat{\tau}_{t_2}.
+\]
+\end{proof}
+
+\begin{retheorem}[Restatement of Theorem \ref{theorem: identify_cwsd}]
+Under the standard Rubin Causal Model assumptions (SUTVA and overlap), the Average Treatment Effect (ATE) is identifiable in a \cwsd{} at $t_2$ if the following assumptions hold:
+\begin{enumerate}
+    \item \textbf{Simple Direct Carryover Effects:} As defined in Assumption \ref{assumption:simple_carryover_effects}.
+    \item \textbf{Ignorability at Time \(t_2\):} 
+    \[
+    Y_{i,t_2}(z_{i,t_2}) \indep Z_{i,t_2} \mid X_{i,t_2}, \quad \forall z_{i,t_2} \in \{0,1\}.
+    \]
+    \item \textbf{Parallel Trends:} 
+    \[
+    Y_{i,t_2}(z_{i,t_2}) = Y_{i,t_1}(z_{i,t_2}) + c, \quad \forall z_{i,t_2} \in \{0,1\}, \quad c \in \mathbb{R}.
+    \]
+\end{enumerate}
+\end{retheorem}
+
+\begin{proof}
+    
+    In a counterbalanced within-subjects design, we only observe \[\mathbb{E}[Y_{i,t_2}^{\text{obs}} \mid Z_{i,t_1} = 1, Z_{i,t_2} = 0, X_{i,t_2}] \quad \text{and} \quad \mathbb{E}[Y_{i,t_2}^{\text{obs}} \mid Z_{i,t_1} = 0, Z_{i,t_2} = 1, X_{i,t_2}]\] 
+
+    Taking the difference for those that receive treatment at time $t_2$ and the control group, yields
+    \[\begin{aligned}
+        & \quad \mathbb{E}[Y_{i,t_2}^{\text{obs}} \mid Z_{i,t_1} = 0, Z_{i,t_2} = 1, X_{i,t_2}] - \mathbb{E}[Y_{i,t_2}^{\text{obs}} \mid Z_{i,t_1} = 1, Z_{i,t_2} = 0, X_{i,t_2}] \\
+        &= \mathbb{E}[Y_{i,t_2}(0,1) \mid Z_{i,t_1} = 0, Z_{i,t_2} = 1, X_{i,t_2}] - \mathbb{E}[Y_{i,t_2}(1,0) \mid Z_{i,t_1} = 1, Z_{i,t_2} = 0, X_{i,t_2}] \quad \textit{(by identity \ref{equation: t2_identity_cwsd})} \\
+        &= \mathbb{E}[Y_{i,t_2}(1) \mid Z_{i,t_2} = 1, X_{i,t_2}] - C - \mathbb{E}[Y_{i,t_2}(0) \mid  Z_{i,t_2} = 0, X_{i,t_2}] + C \quad \textit{(by Assumption \ref{assumption:simple_carryover_effects}}) \\
+        &= \mathbb{E}[Y_{i,t_2}(1) \mid Z_{i,t_2} = 1, X_{i,t_2}] - \mathbb{E}[Y_{i,t_2}(0) \mid  Z_{i,t_2} = 0, X_{i,t_2}]  \\
+        &= \mathbb{E}[Y_{i,t_2}(1) \mid X_{i,t_2}] - \mathbb{E}[Y_{i,t_2}(0) \mid  X_{i,t_2}] \quad \textit{(by ignorability at $t_2$)} \\
+        &= \mathbb{E}[Y_{i,t_2}(1) - Y_{i,t_2}(0) \mid X_{i,t_2}] \quad \textit{(by linearity of expectations)} 
+    \end{aligned}
+    \] 
+
+    With the Conditional Average Treatment Effect, we can apply Adam's Law to obtain the Average Treatment Effect.
+
+    \[\begin{aligned}
+        \mathbb{E}_{X_{i,t_2}}\mathbb{E}[Y_{i,t_2}(1) - Y_{i,t_2}(0) \mid X_{i,t_2}] 
+        &= \mathbb{E}[Y_{i,t_2}(1) - Y_{i,t_2}(0)] \\
+        &= \mathbb{E}[Y_{i,t_1}(1) + c - Y_{i,t_1}(0) - c\,] \quad \textit{(by parallel trends assumption)} \\
+        &= \mathbb{E}[Y_{i,t_1}(1) - Y_{i,t_1}(0)]\\
+        &= \tau
+    \end{aligned}\]
+\end{proof}
+
+\begin{recor}[Restatement of Corollary \ref{cor: two-period-two-arm}]
+    In \emph{any} two‐period, two‐arm sequential experimental design, if \emph{sequential exchangeability}
+  holds, then
+  \[
+    \tau_{t_2}^{\mathrm{seq}} \;=\; \tau.
+  \]
+\end{recor}
+
+
+\begin{proof}
+  Consider any two‐period, two‐arm design whose second‐period observed outcome admits the decomposition
+  \[
+    Y^{\mathrm{obs}}_{i,t_2}
+    = \sum_{z_{t_1},z_{t_2}\in\{0,1\}}
+      Y_{i,t_2}(z_{t_1},z_{t_2})
+      \,1\{Z_{i,t_1}=z_{t_1}\}\,1\{Z_{i,t_2}=z_{t_2}\},
+  \]
+  as in Equation \ref{equation: t2_identity}. Under Assumption \ref{assumption: sequential_exchangeability} (sequential exchangeability), we have
+  \[
+    \mathbb{E}\bigl[Y^{\mathrm{obs}}_{i,t_2}\mid Z_{i,t_1}=z_{t_1}, Z_{i,t_2}=z_{t_2},\,X_{i,t_2}\bigr]
+    = \mathbb{E}\bigl[Y_{i,t_2}(z)\mid X_{i,t_2}\bigr],
+    \quad z_{t_1}, z_{t_2}\in\{0,1\},
+  \]
+  by (a) and (b) of Assumption \ref{assumption: sequential_exchangeability}, and hence
+  \[
+      \mathbb{E}\bigl[Y^{\mathrm{obs}}_{i,t_2}\mid Z_{i,t_2}=1,X_{i,t_2}\bigr]
+      -\mathbb{E}\bigl[Y^{\mathrm{obs}}_{i,t_2}\mid Z_{i,t_2}=0,X_{i,t_2}\bigr] = \mathbb{E}\bigl[Y_{i,t_2}(1)-Y_{i,t_2}(0)\mid X_{i,t_2}\bigr]
+  \]
+  Finally, taking expectations over \(X_{i,t_2}\) and using the parallel‐trends assumption \(Y_{i,t_2}(z)=Y_{i,t_1}(z)+c\) from Assumption 2(c) yields
+  \[
+    \tau^{\mathrm{seq}}_{t_2}
+    = E\bigl[Y_{i,t_2}(1)-Y_{i,t_2}(0)\bigr]
+    = E\bigl[Y_{i,t_1}(1)-Y_{i,t_1}(0)\bigr]
+    = \tau.
+  \]
+  This completes the proof.
+\end{proof}
+
+
+\subsection*{Control–Carryover Simulation}
+
+We conducted a Monte Carlo study to assess how two distinct carryover structures bias the period-2 treatment effect when omitted from the model.  For each simulation:
+
+\begin{itemize}
+  \item \textbf{Sample size:} \(N = 100\) independent subjects.
+  \item \textbf{Period 1:}
+    \begin{align*}
+      Z_1 &\sim \mathrm{Bernoulli}(0.5),\\
+      X_1 &\sim \mathcal{N}(0,1),\\
+      Y_1 &= \alpha_0 + \alpha_1 Z_1 + \alpha_2 X_1 + \varepsilon_1,
+    \end{align*}
+    with parameters
+    \[
+      \alpha_0 = 2,\quad \alpha_1 = 5,\quad \alpha_2 = 5,\quad \varepsilon_1 \sim \mathcal{N}(0,1).
+    \]
+  \item \textbf{Period 2 (two carryover structures):}
+    \begin{enumerate}
+      \item \emph{Additive interaction:}
+        \[
+          Y_{2}^{\rm interact} 
+          = \beta_0 + \beta_1 Z_2 + \gamma\,(Z_1 \times Z_2) + \beta_2 X_2 + \varepsilon_2.
+        \]
+      \item \emph{Compounding effect:}
+        \[
+          Y_{2}^{\rm compound} 
+          = \beta_0 + \beta_1^{\,1 + \gamma Z_1}\,Z_2 + \beta_2 X_2 + \varepsilon_2.
+        \]
+    \end{enumerate}
+    Here,
+    \[
+      Z_2 \sim \mathrm{Bernoulli}(0.5),\quad
+      X_2 = X_1 + \delta,\quad \delta\sim \mathcal{N}(0,1),
+    \]
+    and
+    \[
+      \beta_0 = 2,\quad \beta_1 = 5,\quad \beta_2 = 5,\quad \varepsilon_2 \sim \mathcal{N}(0,1).
+    \]
+  \item \textbf{Grid of carryover magnitudes:} \(\gamma\in\{-5, -4.9, \dots, +5\}\) (100 values), with 100 replications each.
+  \item \textbf{Models fitted to \(Y_2\):}
+    \begin{enumerate}
+      \item \emph{Naïve:} \(\mathrm{lm}(Y_2 \sim Z_2 + X_2)\).
+      \item \emph{Fixed-effect control:} \(\mathrm{lm}(Y_2 \sim Z_2 + Z_1 + X_2)\).
+    \end{enumerate}
+  \item \textbf{Summary:} For each model and carryover structure, we recorded the mean, minimum, and maximum of the estimated coefficient on \(Z_2\) across replications, and plotted these in Figure \ref{fig:simulation_control_carryover}.
+\end{itemize}
+
+\subsection*{CWSD Design–Comparison Simulation}
+
+To compare bias under a fully counterbalanced within-subjects design versus sequential randomization, we simulated two-period data for \(N = 1{,}000\) subjects and evaluated five analytic strategies.
+
+\begin{itemize}
+  \item \textbf{True effect:} \(\tau = 1\).
+  \item \textbf{Period 1:}
+    \begin{align*}
+      Z_{t1} &\sim \mathrm{Bernoulli}(0.5),\\
+      X_{t1} &\sim \mathcal{N}(0,1),\\
+      Y_{t1} &= \tau\,Z_{t1} + X_{t1} + \varepsilon_{t1},\quad \varepsilon_{t1}\sim \mathcal{N}(0,1).
+    \end{align*}
+  \item \textbf{Period 2:}
+    \begin{itemize}
+      \item \emph{Design A (Counterbalanced):} \(Z_{t2} = 1 - Z_{t1}\).
+      \item \emph{Design B (Sequential Randomization):} \(Z_{t2}\sim \mathrm{Bernoulli}(0.5)\).
+      \item Covariate drift:
+        \[
+          X_{t2} = X_{t1} + \gamma\,Z_{t1},\quad \gamma\in\{-10, -9.8, \dots, +10\}\ (\text{101 values}).
+        \]
+      \item Outcome:
+        \[
+          Y_{t2} = \tau\,Z_{t2} + X_{t2} + \varepsilon_{t2},\quad \varepsilon_{t2}\sim \mathcal{N}(0,1).
+        \]
+    \end{itemize}
+  \item \textbf{Replications:} 100 replications per \(\gamma\), stacking \((Y_{t1},Y_{t2})\), \((Z_{t1},Z_{t2})\), and \((X_{t1},X_{t2})\).
+  \item \textbf{Estimation strategies:}
+    \begin{enumerate}
+      \item \emph{No control:} \(\mathrm{lm}(Y \sim Z)\).
+      \item \emph{Direct control:} \(\mathrm{lm}(Y \sim Z + X)\).
+      \item \emph{Propensity-score adjustment:} fit \(\hat e(X) = \Pr(Z=1\mid X)\) via logistic regression, then \(\mathrm{lm}(Y \sim Z + \hat e)\).
+      \item \emph{Fixed-effects:} include period indicator \(t\) in \(\mathrm{lm}(Y \sim Z + t)\).
+      \item \emph{Misspecification:} control with random noise \(U \sim \mathcal{N}(0,1)\) via \(\mathrm{lm}(Y \sim Z + U)\).
+    \end{enumerate}
+  \item \textbf{Summary:} For each strategy and design, we computed the mean and range (min, max) of the estimated \(\tau\) across replications.  Results appear in Figure~\ref{fig:simulation_cwsd}.
+\end{itemize}
+
+\subsection*{Code Availability}
+The code used for this project is publicly available at: \url{https://github.com/justinhjy1004/CWSD}
+

@@ -1,0 +1,126 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx}
+\usepackage{url} % not crucial - just used below for the URL 
+\usepackage{graphicx} % Required for inserting images
+\usepackage{setspace, amsmath, mathtools, enumitem, amsfonts, amsthm}
+\usepackage{natbib}
+\usepackage{bbm}
+\usepackage{tikz}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\doublespacing
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage[nameinlink]{cleveref}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=red,
+    filecolor=magenta,  
+    citecolor=blue,
+    urlcolor=red,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+}
+
+% Custom enumerate for (a), (b), ...
+\newlist{assumptionnum}{enumerate}{1}
+\setlist[assumptionnum]{label=(\alph*),ref=\thetheorem(\alph*)}
+
+\newcommand{\Cwsd}{Counterbalanced within-subjects design}
+\newcommand{\cwsd}{counterbalanced within-subjects design}
+\setlength{\fboxsep}{12pt}  % Padding between box and content
+\setlength{\fboxrule}{0pt}
+
+\newcommand{\wsd}{within-subjects design}
+\newcommand{\Wsd}{Within-subjects design}
+\newcommand{\bsd}{between-subjects design}
+
+\newtheorem*{remark}{Remark}
+\newtheorem*{retheorem}{Theorem}
+\newtheorem{prop}{Proposition}
+\newtheorem*{reprop}{Proposition}
+\newtheorem{cor}{Corollary}
+\newtheorem*{recor}{Corollary}
+\newtheorem{definition}{Definition}
+\newtheorem{claim}{Claim}
+\newtheorem{assumption}{Assumption}
+
+
+% Defined macros
+\newcommand{\indep}{\hspace{-.2em}\perp\!\!\!\!\perp\hspace{-.2em}} 
+
+%\pdfminorversion=4
+% NOTE: To produce blinded version, replace "0" with "1" below.
+\newcommand{\blind}{0}
+
+% DON'T change margins - should be 1 inch all around.
+\addtolength{\oddsidemargin}{-.5in}%
+\addtolength{\evensidemargin}{-.5in}%
+\addtolength{\textwidth}{1in}%
+\addtolength{\textheight}{1.3in}%
+\addtolength{\topmargin}{-.8in}%
+
+
+\begin{document}
+
+%\bibliographystyle{natbib}
+
+\def\spacingset#1{\renewcommand{\baselinestretch}%
+{#1}\small\normalsize} \spacingset{1}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\if0\blind
+{
+  \title{\bf Causal Inference in Counterbalanced Within-Subjects Designs}
+  \author{Justin Ho
+  \thanks{Primary and Corresponding Author (jho@hbs.edu)}\hspace{.2cm}\\
+    Harvard Business School\\
+    and \\
+    Jonathan Min\\
+    University of California, Berkeley}
+  \maketitle
+} \fi
+
+\if1\blind
+{
+  \bigskip
+  \bigskip
+  \bigskip
+  \begin{center}
+    {\LARGE\bf Causal Inference in Counterbalanced Within-Subjects Designs}
+\end{center}
+  \medskip
+} \fi
+
+\bigskip
+
+\input{Body/00_Abstract}
+
+\noindent%
+{\it Keywords:}  Carryover effects, Sequential exchangeability, Potential outcomes framework, Treatment effect identification, Within-subject experimental design, Causal inference assumptions
+
+\vfill
+
+\newpage
+\spacingset{1.45} % DON'T change the spacing!
+
+\input{Body/01_Introduction}
+\input{Body/02_Identification}
+\input{Body/03_SequentialExchangeability}
+\input{Body/04_Strategies}
+\input{Body/05_Conclusion}
+
+
+\bibliographystyle{chicago}
+
+\bibliography{cite}
+
+\newpage
+
+\input{Body/99_Appendix}
+
+\end{document}

@@ -1,0 +1,85 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{setspace, amsmath, mathtools, enumitem, amsfonts, amsthm}
+\usepackage{natbib}
+\usepackage{bbm}
+\usepackage{tikz}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\doublespacing
+\usepackage{geometry}[margin=1in]
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage[nameinlink]{cleveref}
+
+% Custom enumerate for (a), (b), ...
+\newlist{assumptionnum}{enumerate}{1}
+\setlist[assumptionnum]{label=(\alph*),ref=\thetheorem(\alph*)}
+
+\newcommand{\Cwsd}{Counterbalanced within-subjects design}
+\newcommand{\cwsd}{counterbalanced within-subjects design}
+\setlength{\fboxsep}{12pt}  % Padding between box and content
+\setlength{\fboxrule}{0pt}
+
+\newcommand{\wsd}{within-subjects design}
+\newcommand{\Wsd}{Within-subjects design}
+\newcommand{\bsd}{between-subjects design}
+
+\newtheorem*{remark}{Remark}
+\newtheorem*{retheorem}{Theorem}
+\newtheorem{prop}{Proposition}
+\newtheorem*{reprop}{Proposition}
+\newtheorem{cor}{Corollary}
+\newtheorem*{recor}{Corollary}
+\newtheorem{definition}{Definition}
+\newtheorem{claim}{Claim}
+\newtheorem{assumption}{Assumption}
+
+
+% Defined macros
+\newcommand{\indep}{\hspace{-.2em}\perp\!\!\!\!\perp\hspace{-.2em}} 
+
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=red,
+    filecolor=magenta,  
+    citecolor=blue,
+    urlcolor=red,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+}
+
+\title{Causal Inference in Counterbalanced Within-Subjects Designs}
+\author{Justin Ho and Jonathan Min}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\input{Body/00_Abstract}
+
+\input{Body/01_Introduction}
+
+\input{Body/02_Identification}
+
+\input{Body/03_SequentialExchangeability}
+
+\input{Body/04_Strategies}
+
+\input{Body/05_Conclusion}
+
+\newpage
+
+\bibliographystyle{elsarticle-harv} 
+\bibliography{cite.bib}
+
+\newpage
+
+\input{Body/99_Appendix}
+
+\end{document}
+

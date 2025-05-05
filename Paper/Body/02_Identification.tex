@@ -1,0 +1,254 @@
+
+\section{Identification in Counterbalanced Within-Subjects Design}
+\label{sec: identification_assumption}
+
+In this section, we formalize the identification challenges that arises from \cwsd{} by comparing it with an experiment using a \bsd{}, with the goal of recovering the Average Treatment Effect (ATE). We develop the additional assumptions required so that the estimates in a \cwsd{} will yield the same results as in a \bsd{} in this section.
+
+\subsection{Notation}
+
+ Assume that we have $n$ units of observations, where we have the set of associated observed outcome $\{Y_i\}_{i=0}^n$ and an treatment $\{Z_i\}_{i=0}^n$. In the potential outcomes framework, we imagine jointly observing both outcomes of treatment and control \citep{10_holland1986statistics}. We denote the potential outcomes as $(Y_i(1), Y_i(0))$, where $1$ and $0$ indicate that the unit received treatment or control, respectively. From these definitions, we can define the key identity 
+\begin{equation}
+    Y_i = Y_i(1)Z_i + Y_i(0)(1 - Z_i)
+\end{equation}
+which captures the relationship between potential outcomes and observed outcomes. Note that by this identity, $Y_i$ denotes the observed outcome of unit $i$. We also observe the pre-treatment covariates, denoted as $\{X_i\}_{i=0}^n$.
+
+Per the standard definition of the Average Treatment Effect (ATE), it is defined as the difference in the potential outcomes of treatment and control\[\tau = \mathbb{E}[Y_i(1) - Y_i(0)]\] 
+Under the standard assumptions of the Rubin Causal Model, the Average Treatment Effect is identified if \citep{10_holland1986statistics}
+\begin{enumerate}
+    \item $(Y_i(0), Y_i(1)) \indep Z_i \mid X_i$ \textit{(Ignorability)}
+    \item $0 < \text{Pr}\{Z_i = 1 \mid X_i = x\} < 1 \quad \forall x \in X$ \textit{(Overlap)}
+    \item Stable Unit Treatment Value Assumption (SUTVA) - treatment received by a unit does not affect the potential outcomes of other units and the treatment is consistent (there is no variations in the application of the treatment)
+\end{enumerate}
+
+These assumptions together imply that the unobserved counterfactuals can be recovered, in expectation, from observed outcomes conditional on covariates. This leads to the identifiability of the Average Treatment Effect in a between-subjects design where the assumptions are plausibly satisfied.
+
+\begin{theorem}
+\label{theorem: identify_bsd}
+    Under the standard assumptions of the Rubin Causal Model, ATE is identifiable in a between-subjects design.
+\end{theorem}
+
+One of the biggest appeals of an experimental design such as a \bsd{} is that participants are randomly assigned to receive either treatment or control but not both. This removes selection bias if done properly, allowing us to reasonably assume that ignorability holds, and therefore, a simple difference in means estimator without adjustment would lead to an unbiased estimate of ATE.
+
+\begin{remark}
+    We will refer to $\tau = \mathbb{E}[Y_i(1) - Y_i(0)]$ as ATE, or Average Treatment Effect in the rest of the paper. For `time-specific' Average Treatment Effect, we will explicitly mention that we are referring to a different parameter of concern since they entail quite a different interpretation.
+\end{remark}
+
+\subsection{Structure of a Counterbalanced Within-Subjects Design}
+\label{sec: assumption_cwsd}
+
+We begin the analysis of a \cwsd{} in the case where there are two experimental conditions, treatment and control, and two discrete time periods, $t_1$ and $t_2$. In a \cwsd{}, each unit of observation is assigned to both treatment and control, but with each unit being randomly assigned to the sequence of treatment. Let $S_i$ be the sequence a unit $i$ is assigned to, where $\{S_i\}^n_{i=1}$ for when $S_i = 0$, unit $i$ receives control at $t_1$ and then receives treatment at $t_2$ and when $S_i=1$ unit $i$ receives treatment at $t_1$ and then receives control at $t_2$.
+
+\begin{figure}
+    \centering
+    \tikz{
+    \node (2a) at (2,0) {$t_1$};
+    \node (3a) at (3,0) {};
+    \node (4a) at (5,0) {$t_2$};
+
+    \node (1b) at (0,-.5) {$S=0$};
+    \node (2b) at (2,-.5) {Control};
+    \node (3b) at (3.5,-.5) {$\rightarrow$};
+    \node (4b) at (5,-.5) {Treatment};
+
+    \node (1c) at (0,-1) {$S=1$};
+    \node (2c) at (2,-1) {Treatment};
+    \node (3c) at (3.5,-1) {$\rightarrow$};
+    \node (4c) at (5,-1) {Control};
+
+    \node [rectangle,draw] (S) at (0,0.5) {\textit{Sequence}};
+    \node  [rectangle,draw] (T) at (3.5,0.5) {\textit{time}};
+
+    \node (P) at (-2, -0.75) {\textit{Participant}};
+
+    \path[->, thick] (P) edge (1b);
+    \path[->, thick] (P) edge (1c);
+    %check-mark-button
+    %smiling-face-with-horns
+    %nerd-face
+    }
+    \caption{An illustration of a counterbalanced within-subjects experimental design. Participants are randomized into one of the sequences, and then exposed to treatment and control at different times. }
+    \label{fig:CWSD_Figure}
+\end{figure}
+
+$Z_{i,t_1} \in \{0,1\}$ indicates that unit $i$ receives control or treatment at $t_1$, where $Z_{i,t_1} = 1$ when unit $i$ receives treatment and 0 otherwise. In a counterbalanced within-subjects design, $Z_{i,t_2} = 1 - Z_{i,t_1}$ and $S_i = Z_{i,t_1}$. We can define the observed outcomes $Y_{i, t_1}^{\text{obs}}$ and $Y_{i, t_2}^{\text{obs}}$ in terms of the potential outcomes as
+\begin{equation}
+    Y_{i,t_1}^{\text{obs}} = Y_{i,t_1}(1)Z_{i,t_1} + Y_{i,t_1}(0)(1-Z_{i,t_1})
+\end{equation}
+
+\begin{equation}
+\label{equation: t2_identity_cwsd} 
+    Y_{i,t_2}^{\text{obs}} = Y_{i,t_2}(0,1)(1-Z_{i,t_1}) + Y_{i,t_2}(1,0)Z_{i,t_1}
+\end{equation}
+
+At $t_1$, the design is equivalent to a between-subjects design, with the potential outcomes at $t_1$, denoted by $Y_{i,t_1}(1)$ for treatment and $Y_{i,t_1}(0)$ for control. The average treatment effect (ATE) at $t_1$ is defined as
+\[
+\tau_{t_1} = \mathbb{E}\big[Y_{i,t_1}(1) - Y_{i,t_1}(0)\big].
+\]
+Since participants in a \cwsd{} are randomized into the sequence in which they receive the treatment, $\tau_{t_1} = \tau$ trivially as a result.
+
+At $t_2$, \cwsd{} deviates from the standard framework. As a result of the sequential treatment design, participants switch conditions so that the observed potential outcomes are:
+\begin{itemize}
+    \item $Y_{i,t_2}(0,1)$ for those who received control at $t_1$ and treatment at $t_2$, and 
+    \item $Y_{i,t_2}(1,0)$ for those who received treatment at $t_1$ and control at $t_2$.
+\end{itemize}
+Importantly, the potential outcomes $Y_{i,t_2}(0,0)$ and $Y_{i,t_2}(1,1)$ are never observed for all $i$ in a \cwsd{}. Thus, the ``average treatment effect'' at $t_2$, denoted as $\tau_{t_2}$, in a \cwsd{} is defined as
+\[
+\tau_{t_2} = \mathbb{E}\big[ Y_{i,t_2}(0,1) - Y_{i,t_2}(1,0) \big].
+\] 
+Note that this is not the typical parameter that people usually think of when they say ATE, since this is more accurate to describe it as the average treatment effect at $t_2$ given the treated was untreated at time $t_1$ and the untreated was treated at time $t_1$.
+
+Unlike $\tau_{t_1}$, the equality $\tau_{t_2} = \tau$ does not hold automatically. In the following section, we develop the assumptions required such that 
+\[
+\tau_{t_2} = \mathbb{E}\big[ Y_{i,t_2}(0,1) - Y_{i,t_2}(1,0) \big] = \mathbb{E}\big[ Y_{i}(1) - Y_{i}(0) \big] = \tau
+\]
+since this is often the purpose of using \cwsd{} in causal inference. In the following sections, we will primarily focus on the analysis of $\tau_{t_2}$.
+
+\begin{remark}
+    Note that $\tau_{sequence} = \mathbb{E}\big[ Y_{i}(0,1) - Y_{i}(1,0) \big]$ is a valid parameter/estimand. For example, an experimenter might be interested in whether the sequence of control followed by treatment versus treatment followed by control leads to a difference in outcomes. For instance, an experimenter wishing to understand the effects of teaching New Math at an early age followed by a more standard math curriculum—compared to the reverse sequence—might investigate its effect on students' math ability might be interested in estimating $\tau_{sequence}$ without reducing it to the standard definition of ATE.
+\end{remark}
+
+
+\subsection{Estimating Average Treatment Effects in a Counterbalanced Within-Subjects Design}
+
+To justify our focus on \(\tau_{t_2}\), consider a common estimation method used to estimate ATE in a counterbalanced within‐subjects design that employs the following regression specification with an OLS estimator:
+\begin{equation}
+\label{eq: OLS_estimate}
+Y_{i,t} = \alpha_0 + \alpha_1 Z_{i,t} + \alpha_2 \mathbbm{1}\{t = t_1\} + \alpha_3 X_{i,t} + \varepsilon_{i,t}.
+\end{equation}
+
+A key motivation for using a \cwsd{} is to increase effective sample sizes by pooling observations across time periods. In this context, the pooled OLS estimate \(\hat{\alpha}_1\) is interpreted as the estimated average treatment effect in a \cwsd{}, that is, \(\hat{\tau}^{\text{CWSD}} = \hat{\alpha}_1\).
+
+\begin{prop}
+\label{prop: FWL}
+The OLS estimate from Equation \eqref{eq: OLS_estimate}, \(\hat{\alpha}_1 = \hat{\tau}^{\text{CWSD}}\), can be expressed as a convex combination of the period-specific estimates:
+\[
+\hat{\tau}^{\text{CWSD}} = q\,\hat{\tau}_{t_1} + (1-q)\,\hat{\tau}_{t_2},
+\]
+with \(q \in [0,1]\).
+\end{prop}
+
+Proposition \ref{prop: FWL} shows that the pooled OLS estimate from a counterbalanced within-subjects design is a weighted average of the treatment effects from each period. This decomposition allows us to interpret the estimator as a blend of the two time-specific effects, with the weight \(q\) depending on the variance structure of the treatment assignment across periods.
+
+\begin{cor}
+If \(\mathbb{E}[\hat{\tau}_{t_2}] = \tau\), then \(\mathbb{E}[\hat{\tau}^{\text{CWSD}}] = \tau\).
+\end{cor}
+
+This comes immediately from the linearity of expectations, which justifies our subsequent focus on the analysis of $\tau_{t_2}$.
+
+\subsection{Identification Assumptions in a Counterbalanced Within-Subjects Design}
+
+\begin{figure}[h]
+    \centering
+    \tikz{
+    \node (space) at (0,1) {};
+    \node (space) at (0,-2) {};
+    \node (Zt1) at (2,0) {$Z_{i,t_1}$};
+    \node (Xt1) at (0,-1) {$X_{i,t_1}$};
+    \node (Yt1) at (2,-1) {$Y_{i,t_1}$};
+    
+    \node (Zt2) at (4,0) {$Z_{i,t_2}$};
+    \node (Xt2) at (4,-1) {$X_{i,t_2}$};
+    \node (Yt2) at (6,0) {$Y_{i,t_2}$};
+
+    \path[->, thick] (Xt1) edge (Yt1);
+    \path[->, thick] (Zt1) edge (Yt1);
+    \path[->, thick] (Zt1) edge (Zt2);
+    \path[->, thick] (Yt1) edge (Xt2);
+    \path[->, thick] (Zt2) edge (Yt2);
+    \path[->, thick] (Xt2) edge (Yt2);
+    \path[->, thick] (Zt1) edge[out=30, in=150] (Yt2);
+    \path[->, thick] (Zt1) edge (Xt2);
+    \path[->, thick] (Xt1) edge[out=-30, in=-150] (Xt2);
+    }
+    \caption{Potential Causal Pathways in a \Cwsd{}. Note that $X_{i,t_1}, X_{i,t_2}$ includes both \emph{observed and unobserved} covariates for concision.}
+    \label{fig:CWSD_DAG}
+\end{figure}
+
+One of the major challenges in estimating the average treatment effect (ATE) in a \cwsd{} is the presence of \emph{carryover effects}. These effects refer to residual influences from the treatment (or control) administered in the first period, denoted by \(z_{t_1}\), on the outcome observed at the second period, beyond the effect of the treatment received at \(z_{t_2}\). Such residual effects can introduce unwanted variability or bias in the estimation of the treatment effect at time \(t_2\).
+
+Figure \ref{fig:CWSD_DAG} illustrates the causal pathways in a \cwsd{}. The principal identification challenge arises at \(t_2\), where the experimental design allows treatment received at \(t_1\) to confound the effect of the treatment at \(t_2\).
+
+The first potential source of bias is due to the \emph{direct carryover effects} of the treatment at \(t_1\) on the outcome at \(t_2\). This effect is captured by the causal pathway 
+\[
+Z_{i,t_1} \to Y_{i,t_2},
+\]
+indicating that any residual impact of the treatment (or control) at \(t_1\) can directly influence the observed outcome \(Y_{i,t_2}^{\text{obs}}\) at \(t_2\). Before we formalize the concept of direct carryover effects, we first have to define the potential outcome $Y_{i,t_2}(z_{i,t_2})$.
+
+\begin{definition}[Potential Outcome Without Prior Exposure]
+    $Y_{i,t_2}(z_{i,t_2})$ is the potential outcome of unit $i$ if unit $i$ was recruited at $t_2$ and exposed to treatment $z_{i,t_2}$ without any prior exposure at $t_1$.
+\end{definition}
+
+Note that in a \cwsd{}, this is \emph{never} observed. However, it serves as a useful counterfactual for reasoning about what the outcome would have been if unit $i$ appeared at $t_2$ and was only assigned to $z_{i,t_2}$ without any prior exposure. An implicit assumption in the way $Y_{i,t_2}(z_{i,t_2})$ is defined is that \[Y_{i,t_2}(z_{i,t_2}) \indep Z_{i,t_1} \mid Z_{i,t_2}, X_{i,t_2}\] since $Z_{i,t_1}$ `does not exist' in this counterfactual scenario. With this, we can define direct carryover effects as follows:
+
+\begin{definition}[Direct Carryover Effects]
+\label{defi:direct_carryover_effects}
+For any \(i\) and for each combination of treatment assignments \(z_{t_1}, z_{t_2} \in \{0,1\}\), the \emph{direct carryover effect} of \(z_{t_1}\) on the potential outcome \(Y_{i,t_2}(z_{t_1}, z_{t_2})\) given \(z_{t_2}\) is defined as the difference between the potential outcome \(Y_{i,t_2}(z_{t_1}, z_{t_2})\) and the potential outcome without prior exposure \(Y_{i,t_2}(z_{t_2})\)
+\[
+C_{i, z_{t_1} \to z_{t_2}} \coloneqq Y_{i,t_2}(z_{t_1}, z_{t_2}) - Y_{i,t_2}\bigl(z_{t_2}\bigr) \mid Z_{i,t_1} = z_{t_1}, Z_{i,t_2} = z_{t_2}, X_{i,t_2}
+\]
+\end{definition}
+
+
+In words, the direct carryover effects as stated in Definition \ref{defi:direct_carryover_effects} measures the difference between the potential outcome when an individual receives the sequence \((z_{t_1}, z_{t_2})\) and the potential outcome if only the treatment at \(t_2\) were administered. In the perspective of the potential outcomes framework, we can imagine that unit $i$ was recruited at time $t_2$ without participating at all at time $t_1$, and has the potential outcome $Y_{i,t_2}\bigl(z_{t_2}\bigr)$.
+
+In a \cwsd{}, counterbalancing is typically implemented under the assumption that these direct carryover effects are \emph{simple}—that is, they are symmetric and cancel out in expectation \citep{02_maxwell2017designing}. Formally, we define simple direct carryover effects as follows.
+
+\begin{assumption}[Simple Direct Carryover Effects]
+\label{assumption:simple_carryover_effects}
+Direct carryover effects are \emph{simple} if, for any distinct treatment assignments \(z_1, z_2 \in \{0,1\}\) where \(z_1 \neq z_2\), we have
+\[
+\mathbb{E}\Bigl[C_{i, z_1 \to z_2}\Bigr] = \mathbb{E}\Bigl[C_{i, z_2 \to z_1}\Bigr] = C
+\]
+for some constant \(C \in \mathbb{R}\).
+\end{assumption}
+
+
+In addition to direct effects, \emph{indirect carryover effects} may occur when the treatment at \(t_1\) influences covariates measured at \(t_2\), which in turn affect the outcome \(Y_{i,t_2}\). As shown in Figure \ref{fig:CWSD_DAG}, there are two potential indirect pathways:
+\begin{enumerate}[label=(\arabic*), leftmargin=*]
+    \item \(Z_{i,t_1} \to Y_{i,t_1} \to X_{i,t_2} \to Y_{i,t_2}\),
+    \item \(Z_{i,t_1} \to X_{i,t_2} \to Y_{i,t_2}\).
+\end{enumerate}
+To ensure an unbiased estimate of the treatment effect at \(t_2\), these indirect pathways must be blocked, typically by controlling for \(X_{i,t_2}\) or with randomization at $t_2$. 
+
+Finally, given that outcomes may change over time irrespective of treatment, it is necessary to account for time-specific shifts. In other words, even in the absence of treatment, the evolution of outcomes between \(t_1\) and \(t_2\) should be similar across treatment and control groups. This is analogous to the common parallel trends assumption in difference-in-differences analysis, and is stated formally as
+\[
+Y_{i,t_2}(z_{i,t_2}) = Y_{i,t_1}(z_{i,t_2}) + c, \quad \forall z_{i,t_2} \in \{0,1\}, \quad c \in \mathbb{R}.
+\]
+This assumption implies that any time-related change in the outcome is the same for both treatment and control conditions, differing only by a constant \(c\).
+
+The direct and indirect carryover effects, along with the parallel trends assumption, comprise the additional assumptions required for the identification of the ATE in a \cwsd{}. We summarize these conditions in the following theorem.
+
+\begin{theorem}
+\label{theorem: identify_cwsd}
+Under the standard Rubin Causal Model assumptions (SUTVA and overlap), the Average Treatment Effect (ATE) is identifiable in a \cwsd{} at $t_2$ if the following assumptions hold:
+\begin{enumerate}
+    \item \textbf{Simple Direct Carryover Effects:} As defined in Assumption \ref{assumption:simple_carryover_effects}.
+    \item \textbf{Ignorability at Time \(t_2\):} 
+    \[
+    Y_{i,t_2}(z_{i,t_2}) \indep Z_{i,t_2} \mid X_{i,t_2}, \quad \forall z_{i,t_2} \in \{0,1\}.
+    \]
+    \item \textbf{Parallel Trends:} 
+    \[
+    Y_{i,t_2}(z_{i,t_2}) = Y_{i,t_1}(z_{i,t_2}) + c, \quad \forall z_{i,t_2} \in \{0,1\}, \quad c \in \mathbb{R}.
+    \]
+\end{enumerate}
+\end{theorem}
+
+\subsection{Violations of the Identification Assumptions} 
+
+If we assume that direct carryover effects follow the ``simple" definition in Definition \ref{assumption:simple_carryover_effects}, then we have \(\mathbb{E}[C_{i,0 \to 1}] = \mathbb{E}[C_{i,1 \to 0}]\). This balance allows us to obtain an unbiased estimate of the treatment effect at time \( t_2 \), as shown in Theorem \ref{theorem: identify_cwsd}.  
+
+However, when carryover effects are not simple — meaning \(\mathbb{E}[C_{i,0 \to 1}] \neq \mathbb{E}[C_{i,1 \to 0}]\) — counterbalancing alone cannot solve the issue. To illustrate why, consider the following (somewhat extreme) example.  
+
+Perder Pharma, a pharmaceutical company, is developing a pain-relief drug called Moxycontin, which is opioid-based and highly effective at reducing pain (denoted as some \(\tau < 0\)). To save costs, they use a \cwsd{} to test its effect on back pain, randomizing participants into different sequences: some receive Moxycontin first, while others get it later.  
+
+For those who receive a placebo first, the carryover effect \(C_{0 \to 1}\) is close to zero—these participants are fine until they later take Moxycontin, which genuinely helps with pain. However, the carryover effect in the other direction, \(C_{1 \to 0}\), is much larger than \(|\tau|\) and greater than zero. This is because Moxycontin is an opioid, and withdrawal causes severe pain, making things much worse for participants who are taken off the drug. The withdrawal is so extreme that the FDA ultimately concludes Moxycontin increases back pain and denies Perder's application. As a result, more than 400,000 lives are saved, and many others avoid the devastation of opioid addiction.  
+
+Beyond direct carryover effects, \cwsd{} also lacks full randomization in the second time period, unlike \bsd{}. This is because the treatment condition in the first period, \(Z_{i,t_1}\), can indirectly influence covariates—whether observed or unobserved—at \(t_2\). If these covariates (\(X_{i,t_2}\)) are not accounted for, the assumption of ignorability at \(t_2\) may be violated. To illustrate how this assumption may fail to hold, we provide two examples (1) induced selection bias and (2) survivorship bias. 
+
+In the case of an \emph{induced selection bias}, consider an experiment testing the effect of Ozempic on blood sugar levels. A key covariate influencing blood sugar is physical activity. If participants receiving Ozempic are motivated to increase their physical activity---perhaps due to perceived health improvements or weight loss---while the control group’s activity levels remain unchanged, this introduces imbalance. At time \(t_2\), the Ozempic group may, on average, have higher physical activity levels, which would confound the estimated treatment effect and violate the assumption of ignorability.
+
+
+As for \emph{survivorship bias}, consider an experiment testing a treatment for cancer patients. At \(t_1\), participants in the control group who have worse health outcomes might die, effectively dropping out at \(t_2\), whereas some in the treatment group who would have died if assigned to control at \(t_1\) might survive and be observed at \(t_2\). This leads to participants in the treatment group being relatively healthier at \(t_2\) compared to their counterparts in the control group, assuming that the participants in the treatment group at $t_2$ does not suffer a decline of health due to not receiving the treatment at $t_1$.
+
+Lastly, the parallel trends assumption may also be violated. Suppose a study involves participants solving complex problems in two sessions, using a counterbalanced design. If receiving an innovative problem-solving prompt in the first session not only improves performance in that session but also fundamentally changes how participants approach future problems, their learning trajectory shifts. As a result, the outcome evolution between sessions is nonparallel, violating the parallel trends assumption.  
